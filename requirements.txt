@@ -1,0 +1,13 @@
+torch>=2.0.0,<3.0.0
+taker>=1.0.10,<2.0.0
+circuitsvis>=1.43.2,<2.0.0
+hqq>=0.2.1,<0.3.0
+plotly>=5.24.0,<6.0.0
+scikit-learn>=1.5.1,<2.0.0
+ipykernel>=6.29.5,<7.0.0
+ipywidgets>=8.1.5,<9.0.0
+tqdm>=4.66.5,<5.0.0
+bitsandbytes>=0.43.3,<0.44.0
+sentence-transformers>=3.0.1,<4.0.0
+seaborn>=0.13.2,<0.14.0
+openpyxl>=3.1.5,<4.0.0
