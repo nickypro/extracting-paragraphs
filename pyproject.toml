@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "extracting-paragraphs"
+version = "0.1.0"
+description = ""
+authors = ["Nicky Pochinkov <work@nicky.pro>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+torch = "^2.0.0"
+python = "^3.10"
+taker = "^1.0.10"
+circuitsvis = "^1.43.2"
+hqq = "^0.2.1"
+plotly = "^5.24.0"
+scikit-learn = "^1.5.1"
+ipykernel = "^6.29.5"
+ipywidgets = "^8.1.5"
+tqdm = "^4.66.5"
+bitsandbytes = "^0.43.3"
+sentence-transformers = "^3.0.1"
+seaborn = "^0.13.2"
+openpyxl = "^3.1.5"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
