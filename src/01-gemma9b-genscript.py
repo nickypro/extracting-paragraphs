@@ -15,24 +15,20 @@ from taker import Model
 from taker.hooks import HookConfig
 
 # %%
-m = Model("google/gemma-2-9b-it", dtype="bfp16")
+# m = Model("google/gemma-2-9b-it", dtype="bfp16")
+m = Model("meta-llama/Llama-3.2-3B-Instruct", dtype="bfp16")
 m.show_details()
 
 # %%
-with open('../data/promptsV1.csv', newline='') as f:
-    reader = csv.reader(f)
-    readdata = list(reader)
-    readdata = readdata[:20]
-
-import sys
-import os
+folder = "../data/llama3b"
+prefix = "V2"
 # %%
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
 # %%
 # ORIGINAL GENERATIONS
-filename = f"../datadata/latest_orig_generation.jsonl"
+filename = f"{folder}/{prefix}_orig_generation.jsonl"
 if not exists(filename):
     with open(filename, "w") as f:
         pass
@@ -49,7 +45,7 @@ for prompt in readdata:
         data = {
             "temperature": temperature,
             "max_new_tokens": max_new_tokens,
-            "model": "google/gemma-2-9b-it",
+            "model": m.model_repo,
             "type": "original",
             "transplant_layers": None,
             "prompt": prompt,
@@ -60,7 +56,7 @@ for prompt in readdata:
             file.write(json.dumps(data) + "\n")
 
 # NEUTRAL GENERATIONS
-filename = f"../data/latest_neutral0_generation.jsonl"
+filename = f"{folder}/{prefix}_neutral0_generation.jsonl"
 if not exists(filename):
     with open(filename, "w") as f:
         pass
@@ -73,7 +69,7 @@ for neutral in neutral_prompts:
         data = {
             "temperature": temperature,
             "max_new_tokens": max_new_tokens,
-            "model": "google/gemma-2-9b-it",
+            "model": m.model_repo,
             "type": "neutral",
             "cheat_tokens": 0,
             "transplant_layers": None,
@@ -87,7 +83,7 @@ for neutral in neutral_prompts:
 
 # %%
 # TRANSFERRED GENERATIONS
-orig_df = pd.read_json(f"../data/latest_orig_generation.jsonl", lines=True)
+orig_df = pd.read_json(f"{folder}/{prefix}_orig_generation.jsonl", lines=True)
 def split_at_double_newline(text):
     # Ensure we are only working with strings longer than 15 characters
     if len(text) > 15:
@@ -101,7 +97,7 @@ def split_at_double_newline(text):
 orig_df['paragraph1'], orig_df['paragraph2'] = zip(*orig_df['output'].apply(split_at_double_newline))
 orig_df['paragraph1'] = orig_df['prompt'].astype(str) + orig_df['paragraph1'].astype(str)
 print(repr(orig_df['paragraph1'][0]))
-filename = f"../data/latest_transferred_generation.jsonl"
+filename = f"{folder}/{prefix}_transferred_generation.jsonl"
 if not exists(filename):
     with open(filename, "w") as f:
         pass
@@ -123,7 +119,7 @@ for info_prompt in orig_df['paragraph1']:
         data = {
             "temperature": temperature,
             "max_new_tokens": max_new_tokens,
-            "model": "google/gemma-2-9b-it",
+            "model": m.model_repo,
             "type": "transferred",
             "num_transferred_tokens": 1,
             "transplant_layers": (0,m.cfg.n_layers-1),
@@ -141,7 +137,7 @@ for info_prompt in orig_df['paragraph1']:
 # Reset any possible hook values
 [h.reset() for h in m.hooks.neuron_replace.values()]
 
-orig_df = pd.read_json(f"../data/latest_orig_generation.jsonl", lines=True)
+orig_df = pd.read_json(f"{folder}/{prefix}_orig_generation.jsonl", lines=True)
 def split_at_double_newline(text):
     # Ensure we are only working with strings longer than 15 characters
     if len(text) > 15:
@@ -162,8 +158,8 @@ def get_neutral_prompt(text, num_tokens):
     return sep.join(neutral_tokens[1:num_tokens])
 
 
-for neutralnum in [1, 2]:
-    filename = f"../data/latest_neutral{neutralnum}_generation.jsonl"
+for neutralnum in [1, 2, 5, 10]:
+    filename = f"{folder}/{prefix}_neutral{neutralnum}_generation.jsonl"
     if not exists(filename):
         with open(filename, "w") as f:
             pass
@@ -175,7 +171,7 @@ for neutralnum in [1, 2]:
         data = {
             "temperature": temperature,
             "max_new_tokens": max_new_tokens,
-            "model": "google/gemma-2-9b-it",
+            "model": m.model_repo,
             "type": "neutral",
             "cheat_tokens": neutralnum,
             "transplant_layers": None,
